@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Harmony Companion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            height: 90vh;
+        }
+
+        .header {
+            padding: 20px;
+            background: transparent;
+            color: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .chat-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            height: 100%;
+            position: relative;
+        }
+
+        .chat-messages {
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #eee;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .message-bubble {
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .bot-message .message-bubble {
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .user-message {
+            margin-left: auto;
+        }
+
+        .user-message .message-bubble {
+            background: #4361ee;
+            color: white;
+        }
+
+        .input-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 300px;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .message-input:focus {
+            border-color: #4361ee;
+        }
+
+        .send-button {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4361ee;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .send-button:hover {
+            background: #3651d4;
+        }
+
+        .emotion-bars {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .emotion-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bar-container {
+            height: 120px;
+            width: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: #4361ee;
+            transition: height 0.5s;
+            border-radius: 10px;
+        }
+
+        .emotion-label {
+            margin-top: 5px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+        }
+
+        .music-recommendations {
+            margin-top: 20px;
+        }
+
+        .recommendation {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .recommendation:hover {
+            background: #f0f0f0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Emotion Harmony Companion</h1>
+        <p>Your personal emotional wellness guide</p>
+        <button class="close-button">×</button>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-content">
+            <div class="chat-messages">
+                <div class="message bot-message">
+                    <div class="message-bubble">
+                        Hello! I'm here to understand and support your emotional journey. How are you feeling today? 🌈
+                    </div>
+                </div>
+                <!-- Messages will be added here -->
+            </div>
+
+            <div class="sidebar">
+                <div class="emotion-section">
+                    <h2 class="section-title">Emotion Insights</h2>
+                    <div class="emotion-bars">
+                        <div class="emotion-bar">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="height: 0%"></div>
+                            </div>
+                            <span class="emotion-label">Joy</span>
+                        </div>
+                        <div class="emotion-bar">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="height: 0%"></div>
+                            </div>
+                            <span class="emotion-label">Sadness</span>
+                        </div>
+                        <div class="emotion-bar">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="height: 0%"></div>
+                            </div>
+                            <span class="emotion-label">Anger</span>
+                        </div>
+                        <div class="emotion-bar">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="height: 0%"></div>
+                            </div>
+                            <span class="emotion-label">Fear</span>
+                        </div>
+                        <div class="emotion-bar">
+                            <div class="bar-container">
+                                <div class="bar-fill" style="height: 0%"></div>
+                            </div>
+                            <span class="emotion-label">Surprise</span>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">Music Recommendations</h2>
+                    <div class="music-recommendations">
+                        <!-- Recommendations will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-container">
+                <input type="text" class="message-input" placeholder="Type your message..." id="messageInput">
+                <button class="send-button" id="sendButton">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+        const chatMessages = document.querySelector('.chat-messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const emotionBars = document.querySelectorAll('.bar-fill');
+        const musicRecommendations = document.querySelector('.music-recommendations');
+
+        function updateEmotionBars(emotions) {
+            Object.entries(emotions).forEach(([emotion, value], index) => {
+                emotionBars[index].style.height = `${value * 10}%`;
+            });
+        }
+
+        function updateMusicRecommendations(recommendations) {
+            musicRecommendations.innerHTML = '';
+            recommendations.forEach(rec => {
+                const div = document.createElement('div');
+                div.className = 'recommendation';
+                div.textContent = rec;
+                div.onclick = () => {
+                    window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(rec)}`, '_blank');
+                };
+                musicRecommendations.appendChild(div);
+            });
+        }
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = message;
+            
+            messageDiv.appendChild(bubble);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            messageInput.value = '';
+            addMessage(message, true);
+            sendButton.disabled = true;
+            sendButton.innerHTML = '<div class="loading"></div>';
+
+            try {
+                const response = await fetch('http://localhost:5000/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        user_id: userId
+                    }),
+                });
+
+                const data = await response.json();
+                addMessage(data.bot_reply);
+                updateEmotionBars(data.emotions);
+                updateMusicRecommendations(data.recommendations);
+
+            } catch (error) {
+                addMessage('Sorry, I encountered an error. Please try again.');
+            }
+
+            sendButton.disabled = false;
+            sendButton.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            `;
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
